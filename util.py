@@ -3,7 +3,7 @@ import glob
 
 def get_data():
     data = []
-    for f in glob.glob('./data/*.json'):
+    for f in sorted(glob.glob('./data/*.json')):
         temp = pd.read_json(f)
         data.append(temp)
     return pd.concat(data)
