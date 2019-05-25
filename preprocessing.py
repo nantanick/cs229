@@ -1,8 +1,4 @@
 from util import get_data
-
-
-data = get_data()
-
 import pandas as pd
 import numpy as np
 
@@ -89,16 +85,17 @@ def create_ma_cross(ma, price_array):
     return ma_cross
 
 def main():
-    df_gc6 = pd.read_csv('CHRIS-CME_HG6.csv')
 
-    df = df_gc6[['Date','Settle', 'Volume']]
+    #df = data[['Date','Settle', 'Volume']]
+    data = get_data()
 
-    df = df.assign(Time=range(1, df.shape[0]+1))
-    window_sma = [5, 10, 15, 20, 50, 100]
-    window_ema = [10, 12, 20, 26, 50, 100]
+    df = data
 
-    price_val = np.array(df['Settle'])[::-1]
-    time_val = np.array(df['Time'])[::-1]
+    window_sma = [5, 10, 15, 20, 50, 100, 200]
+    window_ema = [10, 12, 20, 26, 50, 100, 200]
+
+    price_val = np.array(df['close'])
+    time_val = np.array(df['Time'])
     daily_return = create_return(price_val, window = 1)
 
     sma_map = {}
