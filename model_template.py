@@ -1,6 +1,6 @@
 # Abstract Class for model
 
-class AlphaModel():
+class Model():
     def __init__(self):
         raise NotImplementedError
 
