@@ -1,4 +1,4 @@
-from util import get_data
+from util import get_raw_data
 import pandas as pd
 import numpy as np
 
@@ -96,7 +96,7 @@ def create_class(price_array):
 def main():
 
     #df = data[['Date','Settle', 'Volume']]
-    data = get_data()
+    data = get_raw_data()
 
     df = data
 
