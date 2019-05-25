@@ -84,6 +84,15 @@ def create_ma_cross(ma, price_array):
             ma_cross[i] = 0
     return ma_cross
 
+def create_class(price_array):
+    output = np.zeros(len(price_array))
+    for i in range(len(price_array)):
+        if price_array[i+1] > price_array[i]:
+            output[i] = 1
+        if i+2 == len(price_array): break
+    return output
+
+
 def main():
 
     #df = data[['Date','Settle', 'Volume']]
@@ -94,9 +103,9 @@ def main():
     window_sma = [5, 10, 15, 20, 50, 100, 200]
     window_ema = [10, 12, 20, 26, 50, 100, 200]
 
-    price_val = np.array(df['close'])
-    time_val = np.array(df['Time'])
-    daily_return = create_return(price_val, window = 1)
+    price_val = np.array(df['average'])
+    time_val = np.array(df['date'])
+    daily_return = create_class(price_val)
 
     sma_map = {}
     ema_map = {}
@@ -121,18 +130,20 @@ def main():
         day_since_cross_map["Day_Since_" + str(m)] = create_day_since_cross(sma_cross_map[m])
         day_since_cross_map["Day_Since_" + str(l)] = create_day_since_cross(ema_cross_map[l])
 
-    raw_data = {'Time':time_val, 'Settle_Price': price_val,
-    'Daily_Return': daily_return, 'Volume': np.array(df['Volume'][::-1]),'SMA5' : sma_map["SMA5"],
+    raw_data = {'Date':time_val, 'Price': price_val, 'Minute':np.array(df['minute']),
+    'Class': daily_return, 'Volume': np.array(df['volume']),'SMA5' : sma_map["SMA5"],
     'SMA10' : sma_map["SMA10"], 'SMA15' : sma_map["SMA15"], 'SMA20' : sma_map["SMA20"],
-    'SMA50' : sma_map["SMA50"], 'SMA100' : sma_map["SMA100"], 'EMA10' : ema_map["EMA10"],
-    'EMA12' : ema_map["EMA12"], 'EMA20' : ema_map["EMA20"], 'EMA26' : ema_map["EMA26"],
-    'EMA50' : ema_map["EMA50"], 'EMA100' : ema_map["EMA100"], 'MACD' : macd_val, 'MACD_Cross' : macd_cross,
+    'SMA50' : sma_map["SMA50"], 'SMA100' : sma_map["SMA100"], 'SMA200' : sma_map["SMA200"],
+    'EMA10' : ema_map["EMA10"], 'EMA12' : ema_map["EMA12"], 'EMA20' : ema_map["EMA20"],
+    'EMA26' : ema_map["EMA26"], 'EMA50' : ema_map["EMA50"], 'EMA100' : ema_map["EMA100"],
+    'EMA200' : ema_map["EMA200"], 'MACD' : macd_val, 'MACD_Cross' : macd_cross,
     'SMA5Cross' : sma_cross_map["SMA_CROSS5"], 'SMA10Cross' : sma_cross_map["SMA_CROSS10"],
     'SMA15Cross' : sma_cross_map["SMA_CROSS15"], 'SMA20Cross' : sma_cross_map["SMA_CROSS20"],
     'SMA50Cross' : sma_cross_map["SMA_CROSS50"], 'SMA100Cross' : sma_cross_map["SMA_CROSS100"],
     'EMA12Cross' : ema_cross_map["EMA_CROSS12"], 'EMA10Cross' : ema_cross_map["EMA_CROSS10"],
     'EMA20Cross' : ema_cross_map["EMA_CROSS20"], 'EMA26Cross' : ema_cross_map["EMA_CROSS26"],
     'EMA50Cross' : ema_cross_map["EMA_CROSS50"], 'EMA100Cross' : ema_cross_map["EMA_CROSS100"],
+    'SMA200Cross' : sma_cross_map["SMA_CROSS200"], 'EMA200Cross' : ema_cross_map["EMA_CROSS200"],
     'Up-Down5' : up_down_map["Up-Down5"],'Up-Down10' : up_down_map["Up-Down10"], 'Up-Down15' : up_down_map["Up-Down15"],
     'Up-Down20' : up_down_map["Up-Down20"],'Up-Down50' : up_down_map["Up-Down50"], 'Up-Down100' : up_down_map["Up-Down100"],
     'Day_Since_SMA5Cross' : day_since_cross_map["Day_Since_SMA_CROSS5"], 'Day_Since_SMA10Cross' : day_since_cross_map["Day_Since_SMA_CROSS10"],
@@ -143,9 +154,8 @@ def main():
     'Day_Since_EMA50Cross' : day_since_cross_map["Day_Since_EMA_CROSS50"], 'Day_Since_EMA100Cross' : day_since_cross_map["Day_Since_EMA_CROSS100"]
     }
 
-    Date = np.array(df['Date'][::-1])
-    data = pd.DataFrame(raw_data, index = Date)
-    data[100:len(Date)].to_csv("Copper_6.csv")
+    data = pd.DataFrame(raw_data)
+    data[200:len(price_val)].to_csv("spy1min.csv")
 
 if __name__ == "__main__":
     main()
