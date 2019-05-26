@@ -41,4 +41,7 @@ class RegressionModel():
         	self.model.fit(X,Y)
 
     def predict(self, X):
-        return np.array(self.model.predict(X))
+        if self.regularization == 1:
+            return np.array(self.model.predict_proba(X))
+        else:
+            return np.array(self.model.predict(X))

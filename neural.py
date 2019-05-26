@@ -14,7 +14,7 @@ class NN_wrapper():
 
 	def to_tensor(self,df):
 		#convert data frame into x,y tensors
-		return torch.tensor(df.values).type(torch.FloatTensor)
+		return torch.tensor(df).type(torch.FloatTensor)
 
 	def train(self, X, Y, epochs =3000):
 		x_train = self.to_tensor(X)
@@ -52,7 +52,7 @@ class NeuralNet(nn.Module):
 
 
 if __name__ == '__main__':
-	
+
 	train, validation, test = get_clean_data()
 	X = train.drop(['Date','Class','Minute'], axis=1)
 	Y = train['Class']
@@ -61,12 +61,3 @@ if __name__ == '__main__':
 
 	X = validation.drop(['Date','Class','Minute'], axis=1)
 	print(NN.predict(X))
-	
-
-
-
-
-
-
-	
-	
