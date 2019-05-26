@@ -1,5 +1,5 @@
 import numpy as np
-
+import pandas as pd
 def profit_eval(portfolio):
     """
     Output different evaluation metrics from portfolio value over time
@@ -99,38 +99,61 @@ def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,
                     units[i] = cash[i]/true_price[i]
                     cash[i] = 0
                     cond = 2
-                elif: prediction[i] < threshold[0]:
+                elif prediction[i] < threshold[0]:
                     units[i] = -cash[i]/true_price[i]
                     cash[i] = cash[i] - units[i]*true_price[i]
                     cond = 3
             #Exiting long position
-            elif cond == 2:
-                units =  cash/price_array[i]
-                cond = 2
+            elif cond == 2 and prediction[i] < threshold[0]:
+                #Exit long
+                cash[i] = cash[i-1] + units[i-1]*true_price[i]
+                units[i] = 0
+                #Enter Short
+                units[i] = -cash[i]/true_price[i]
+                cash[i] = cash[i] - units[i]*true_price[i]
+                cond = 3
             #Exiting short position
-            elif cond == 3:
-                units = -money/price_array[i]
-                cond = 3    
+            elif cond == 3 and prediction[i] > threshold[1]:
+                #Exit short
+                cash[i] = cash[i-1] + units[i-1]*true_price[i]
+                units[i] = 0
+                #Enter long
+                units[i] = -cash[i]/true_price[i]
+                cash[i] = cash[i] - units[i]*true_price[i]
+                cond = 3
             #Holding Condition
             else:
-                cash[i+1] = cash[i]
-                units[i+1] = units[i]
-        elif !short:
+                cash[i] = cash[i-1]
+                units[i] = units[i-1]
+        else:
             #Entering position
             if cond == 1 and prediction[i] > threshold[1]:
                 units[i] = cash[i]/true_price[i]
                 cash[i] = 0
                 cond = 2
             #Exiting position
-            elif cond == 2 prediction[i] < threshold[0]:
+            elif cond == 2 and prediction[i] < threshold[0]:
                 cash[i] = true_price[i]*units[i-1]
                 units[i] = 0
                 cond = 1
             #Holding Condition
             else:
-                cash[i+1] = cash[i]
-                units[i+1] = units[i]
+                cash[i] = cash[i-1]
+                units[i] = units[i-1]
 
     value_over_time = cash + units*true_price - borrow
 
-    return value_over_time
+    return value_over_time, cash, units
+
+#Testing
+price = np.array([100,200,400,200,100,200,400])
+money = 100
+pred = np.array([0.2,0.7,0.5,0.9,0.3,0.1,0.8])
+threshold = np.array([.4,.6])
+leverage = [1,3]
+
+for i in leverage:
+    value_over_time, cash, units = portfolio_generator(principal = money, prediction = pred, true_price = price,
+                                                        threshold = threshold, leverage = i, short = True)
+    raw_data = {'Portfolio Value':value_over_time, 'Cash': cash, 'Units': units, 'Prediction': pred, 'True Price': price}
+    pd.DataFrame(raw_data).to_csv("test"+str(i)+".csv")
