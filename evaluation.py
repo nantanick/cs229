@@ -1,23 +1,37 @@
 import numpy as np
 
-def profit_eval(principal,prediction,true_price,threshold):
-    units = 0.0 #number of shares owned
-    value_over_time = [] #portfolio value over time
-    money = principal
-    for i in range(len(prediction)):
-        if prediction[i] > threshold:
-            unit = money/true_price[i]
-    
-    abs_profit = 0
-    annual_prof = 0
-    volatility = 0
-    sharpe = 0
+def profit_eval(portfolio):
+    """
+    Output different evaluation metrics from portfolio value over time
 
-    return abs_profit, annual_prof, volatility, sharpe
+    Parameters
+    ----------
+    portfolio : np.array
+        portfolio value overtime
+        length should be equal to nrow(test_set)
 
-def f1score(prediction,true_class):
-    score = 0
-    return score
+    Returns
+    -------
+    abs_profit: float
+        Total profit in absolute term ($$)
+
+    annual_prof: float
+        Annualized profit in percentage
+
+    sharpe: float
+        sharpe ratio - calculated by sqrt[(num_trading_day)*(num_trading_minutes)]*np.mean(minute_return)/volatility
+    """
+    num_trading_day = 252.
+    num_trading_minutes = 390.
+    return_array = np.zeros(len(portfolio-1))
+    for i in range(return_array):
+        return_array[i] = portfolio[i+1]/portfolio[i] - 1
+
+    abs_profit = portfolio[len(portfolio-1)]-portfolio[0]
+    annual_prof = ((portfolio[len(portfolio-1)]/portfolio[0]-1) ** (num_trading_day*num_trading_minutes/len(portfolio))-1)*100
+    sharpe = np.sqrt(num_trading_day*num_trading_minutes)*np.mean(return_array)/np.std(return_array)
+
+    return abs_profit, annual_prof, sharpe
 
 def accuracy(prediction,true_class):
 
@@ -28,3 +42,95 @@ def accuracy(prediction,true_class):
     accuracy = np.mean(true_class == pred)
 
     return accuracy
+
+def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,short = True):
+
+    """
+    Generate portfolio value over time from prediction
+
+    Parameters
+    ----------
+    principal : float
+        how much money to start off with
+
+    prediction: np.array
+        prediction from model such that each element is in [0,1]
+
+    true_price: np.array
+        stock price array
+
+    threshold: np.array, len=2
+        format = [selling threshold, buying threshold]
+        baseline_case: [0.5,0.5]
+        [0.2,0.7] means
+            sell if pred in [0,0.2]
+            hold if pred in [0.2,0.7]
+            buy if pred in [0.7,1]
+
+    leverage: float
+        how much leverage to take
+
+    short: boolean
+        allowing shorting or not
+
+    Returns
+    -------
+    value_over_time: np.array
+        portfolio value over time // for plotting purposes
+    """
+    n = len(true_price)
+    value_over_time = np.zeros(n) #portfolio value over time
+    cash = np.zeros(n) #cash value over time
+    units = np.zeros(n) #shares owned over time
+    cash[0] = principal*leverage
+    units[0] = 0.0
+    borrow = np.ones(n)*principal*(leverage-1) #amount borrowed
+    cond = 1
+    '''
+    condition 1: all cash
+    condition 2: no cash with positive # of shares
+    condition 2: excess cash with negative # of shares
+    '''
+    for i in range(n):
+        if short:
+            #Entering position
+            if cond == 1:
+                if prediction[i] > threshold[1]:
+                    units[i] = cash[i]/true_price[i]
+                    cash[i] = 0
+                    cond = 2
+                elif: prediction[i] < threshold[0]:
+                    units[i] = -cash[i]/true_price[i]
+                    cash[i] = cash[i] - units[i]*true_price[i]
+                    cond = 3
+            #Exiting long position
+            elif cond == 2:
+                units =  cash/price_array[i]
+                cond = 2
+            #Exiting short position
+            elif cond == 3:
+                units = -money/price_array[i]
+                cond = 3    
+            #Holding Condition
+            else:
+                cash[i+1] = cash[i]
+                units[i+1] = units[i]
+        elif !short:
+            #Entering position
+            if cond == 1 and prediction[i] > threshold[1]:
+                units[i] = cash[i]/true_price[i]
+                cash[i] = 0
+                cond = 2
+            #Exiting position
+            elif cond == 2 prediction[i] < threshold[0]:
+                cash[i] = true_price[i]*units[i-1]
+                units[i] = 0
+                cond = 1
+            #Holding Condition
+            else:
+                cash[i+1] = cash[i]
+                units[i+1] = units[i]
+
+    value_over_time = cash + units*true_price - borrow
+
+    return value_over_time
