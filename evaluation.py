@@ -28,7 +28,7 @@ def profit_eval(portfolio):
         return_array[i] = portfolio[i+1]/portfolio[i] - 1
 
     abs_profit = portfolio[len(portfolio-1)]-portfolio[0]
-    annual_prof = ((portfolio[len(portfolio-1)]/portfolio[0]-1) ** (num_trading_day*num_trading_minutes/len(portfolio)))*100
+    annual_prof = ((portfolio[len(portfolio-1)]/portfolio[0]) ** (num_trading_day*num_trading_minutes/len(portfolio)) - 1)*100
     sharpe = np.sqrt(num_trading_day*num_trading_minutes)*np.mean(return_array)/np.std(return_array)
 
     return abs_profit, annual_prof, sharpe
