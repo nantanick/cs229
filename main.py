@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import evaluation as eval
 import os
 import warnings
@@ -45,7 +45,7 @@ def main():
 
     #Get Data
     df_train, df_validation, df_test = get_clean_data()
-
+    Xtrain
     Xtrain = df_train[features].values
     Ytrain = df_train[label].values.ravel()
     Xvalid = df_valid[features].values
@@ -58,15 +58,15 @@ def main():
     '''
     #Neural Network
     NN = NN_wrapper(Xtrain.shape[1])
-	NN.train(Xtrain,Ytrain)
+    NN.train(Xtrain,Ytrain)
 
     #Logistic Regression Model
-    model = RegressionModel(1)
-    model_ridge = RegressionModel(2)
-    model_lasso = RegressionModel(3)
-    model.train(Xtrain, Ytrain)
-    model_ridge.train(Xtrain, Ytrain)
-    model_lasso.train(Xtrain, Ytrain)
+    logistic = RegressionModel(1)
+    logistic_ridge = RegressionModel(2)
+    logistic_lasso = RegressionModel(3)
+    logistic.train(Xtrain, Ytrain)
+    logistic_ridge.train(Xtrain, Ytrain)
+    logistic_lasso.train(Xtrain, Ytrain)
 
     #SVM Model
     svm_linear = SVMModel(1)
@@ -81,29 +81,36 @@ def main():
     '''
     Prediction
     '''
-    nn_pred = np.array(NN.predict(Xtrain))
-    logistic_pred = np.array(model.predict(Xtest))
-    logistic_ridge_pred = np.array(model_ridge.predict(Xtest))
-    logistic_lasso_pred = np.array(model_lasso.predict(Xtest))
-    svm_linear_pred = np.array(svm_linear.predict(Xtest))
-    svm_poly_pred = np.array(svm_poly.predict(Xtest))
-    svm_rbf_pred = np.array(svm_rbf.predict(Xtest))
-    svm_sigmoid_pred = np.array(svm_sigmoid.predict(Xtest))
+    all_pred = {}
+    all_pred['nn_pred'] = np.array(NN.predict(Xvalid))
+    all_pred['logistic_pred'] = np.array(logistic.predict(Xvalid))
+    all_pred['logistic_ridge_pred'] = np.array(logistic_ridge.predict(Xvalid))
+    all_pred['logistic_lasso_pred'] = np.array(logistic_lasso.predict(Xvalid))
+    all_pred['svm_linear_pred'] = np.array(svm_linear.predict(Xvalid))
+    all_pred['svm_poly_pred'] = np.array(svm_poly.predict(Xvalid))
+    all_pred['svm_rbf_pred'] = np.array(svm_rbf.predict(Xvalid))
+    all_pred['svm_sigmoid_pred'] = np.array(svm_sigmoid.predict(Xvalid))
 
     '''
     Evaluation
     '''
-    accuracy_clf = accuracy_score(Ytest, Y_pred, normalize = True)
-    accuracy_clf_ridge = accuracy_score(Ytest, Y_pred_ridge, normalize = True)
-    accuracy_clf_lasso = accuracy_score(Ytest, Y_pred_lasso, normalize = True)
-    f1_clf = f1_score(Ytest, np.array(Y_pred), average='weighted')
-    f1_clf_ridge = f1_score(Ytest, np.array(Y_pred_ridge), average='weighted')
-    f1_clf_lasso = f1_score(Ytest, np.array(Y_pred_lasso), average='weighted')
+    for key, pred in all_pred.items():
+        print('Accuracy Score of', key)
+        print(eval.accuarcy(prediction = pred, true_class = Yvalid))
+        print('F1 Score of', key)
+        print(f1_score(Yvalid, pred, average='micro'))
+        print('='*50)
 
     '''
     Portfolio Generation
     '''
-
+    price = df_valid['Price'].values
+    for key, pred in all_pred.items():
+        portfolio = eval.portfolio_generator(principal = 10000.,prediction = pred, true_price = price,threshold = [0.5,0.5] ,leverage = 1 ,short = True)
+        abs_profit, annual_prof, sharpe = profit_eval(portfolio)
+        print('Annual Profit for', key)
+        print(annual_prof)
+        print('*'*50)
 
 if __name__ == "__main__":
     main()

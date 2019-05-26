@@ -36,9 +36,6 @@ def profit_eval(portfolio):
 
 def accuracy(prediction,true_class):
 
-    prediction =np.array(prediction)
-    true_class =np.array(true_class)
-
     pred = np.where(prediction > 0.5, 1, 0)
     accuracy = np.mean(true_class == pred)
 
@@ -100,63 +97,63 @@ def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,
                     units[i] = cash[i]/true_price[i]
                     cash[i] = 0
                     cond = 2
-                    print('Enter Long from none')
+                    #print('Enter Long from none')
                 elif prediction[i] < threshold[0]:
                     units[i] = -cash[i]/true_price[i]
                     cash[i] = cash[i] - units[i]*true_price[i]
                     cond = 3
-                    print('Enter Short from none')
+                    #print('Enter Short from none')
             #Exiting long position
             elif cond == 2 and prediction[i] < threshold[0]:
                 #Exit long
                 cash[i] = cash[i-1] + units[i-1]*true_price[i]
                 units[i] = 0
-                print('Exit long')
+                #print('Exit long')
                 #Enter Short
                 units[i] = -cash[i]/true_price[i]
                 cash[i] = cash[i] - units[i]*true_price[i]
                 cond = 3
-                print('Enter short from long')
+                #print('Enter short from long')
             #Exiting short position
             elif cond == 3 and prediction[i] > threshold[1]:
                 #Exit short
                 cash[i] = cash[i-1] + units[i-1]*true_price[i]
                 units[i] = 0
-                print('Exit Short')
+                #print('Exit Short')
                 #Enter long
                 units[i] = cash[i]/true_price[i]
                 cash[i] = cash[i] - units[i]*true_price[i]
                 cond = 2
-                print('Enter long from short')
+                #print('Enter long from short')
             #Holding Condition
             else:
                 cash[i] = cash[i-1]
                 units[i] = units[i-1]
-                print('Holding')
+                #print('Holding')
         else:
             #Entering position
             if cond == 1 and prediction[i] > threshold[1]:
                 units[i] = cash[i]/true_price[i]
                 cash[i] = 0
                 cond = 2
-                print('Enter')
+                #print('Enter')
             #Exiting position
             elif cond == 2 and prediction[i] < threshold[0]:
                 cash[i] = true_price[i]*units[i-1]
                 units[i] = 0
                 cond = 1
-                print('Exit')
+                #print('Exit')
             #Holding Condition
             else:
                 cash[i] = cash[i-1]
                 units[i] = units[i-1]
-                print('Holding')
+                #print('Holding')
 
     value_over_time = cash + units*true_price - borrow
 
     return value_over_time, cash, units
 
-'''
+
 #Testing
 price = np.array([100,99,101,102,105,110,115])
 money = 100
@@ -168,5 +165,4 @@ for i in leverage:
     value_over_time, cash, units = portfolio_generator(principal = money, prediction = pred, true_price = price,
                                                         threshold = threshold, leverage = i, short = True)
     raw_data = {'Portfolio Value':value_over_time, 'Cash': cash, 'Units': units, 'Prediction': pred, 'True Price': price}
-    pd.DataFrame(raw_data).to_csv("test"+str(i)+".csv")
-'''
+    #pd.DataFrame(raw_data).to_csv("test"+str(i)+".csv")
