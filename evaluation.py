@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from sklearn import metrics
 
 def profit_eval(portfolio):
     """
@@ -22,24 +23,29 @@ def profit_eval(portfolio):
     sharpe: float
         sharpe ratio - calculated by sqrt[(num_trading_day)*(num_trading_minutes)]*np.mean(minute_return)/volatility
     """
-    num_trading_day = 252.
+    num_trading_day = 30.*5/7
     num_trading_minutes = 390.
-    return_array = np.zeros(len(portfolio-1))
-    for i in range(return_array):
+    n = len(portfolio)-1
+    return_array = np.zeros(n)
+    for i in range(len(return_array)):
         return_array[i] = portfolio[i+1]/portfolio[i] - 1
 
-    abs_profit = portfolio[len(portfolio-1)]-portfolio[0]
-    annual_prof = ((portfolio[len(portfolio-1)]/portfolio[0]) ** (num_trading_day*num_trading_minutes/len(portfolio)) - 1)*100
+    abs_profit = portfolio[len(portfolio)-1]-portfolio[0]
+    power = num_trading_day*num_trading_minutes/len(portfolio)
+    profit = (portfolio[len(portfolio)-1]/portfolio[0]) ** (power) - 1
     sharpe = np.sqrt(num_trading_day*num_trading_minutes)*np.mean(return_array)/np.std(return_array)
 
-    return abs_profit, annual_prof, sharpe
+    return abs_profit, profit, sharpe
 
 def accuracy(prediction,true_class):
-
     pred = np.where(prediction > 0.5, 1, 0)
     accuracy = np.mean(true_class == pred)
-
     return accuracy
+
+def f1score(prediction,true_class, average='micro'):
+    pred = np.where(prediction > 0.5, 1, 0)
+    score = metrics.f1_score(pred, true_class, average = average)
+    return score
 
 def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,short = True):
 
@@ -76,7 +82,7 @@ def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,
     value_over_time: np.array
         portfolio value over time // for plotting purposes
     """
-    n = len(true_price)
+    n = true_price.shape[0]
     value_over_time = np.zeros(n) #portfolio value over time
     cash = np.zeros(n) #cash value over time
     units = np.zeros(n) #shares owned over time
@@ -149,20 +155,28 @@ def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,
                 units[i] = units[i-1]
                 #print('Holding')
 
-    value_over_time = cash + units*true_price - borrow
+    value_over_time = cash + np.multiply(units,true_price) - borrow
 
-    return value_over_time, cash, units
+    raw_data = {'Portfolio Value':value_over_time, 'Cash': cash, 'Units': units}
+    pd.DataFrame(raw_data).to_csv("debug.csv")
+
+    return value_over_time
 
 
 #Testing
-price = np.array([100,99,101,102,105,110,115])
-money = 100
-pred = np.array([0.2,0.7,0.5,0.9,0.3,0.1,0.8])
-threshold = np.array([.4,.6])
-leverage = [1,3]
+if False:
+    price = np.array([100,99,101,102,105,110,115])
+    money = 100
+    pred = np.array([0.2,0.7,0.5,0.9,0.3,0.1,0.8])
+    threshold = np.array([.4,.6])
+    leverage = [1,3]
 
-for i in leverage:
-    value_over_time, cash, units = portfolio_generator(principal = money, prediction = pred, true_price = price,
-                                                        threshold = threshold, leverage = i, short = True)
-    raw_data = {'Portfolio Value':value_over_time, 'Cash': cash, 'Units': units, 'Prediction': pred, 'True Price': price}
-    #pd.DataFrame(raw_data).to_csv("test"+str(i)+".csv")
+    for i in leverage:
+        value_over_time, cash, units = portfolio_generator(principal = money, prediction = pred, true_price = price,
+                                                            threshold = threshold, leverage = i, short = True)
+        raw_data = {'Portfolio Value':value_over_time, 'Cash': cash, 'Units': units, 'Prediction': pred, 'True Price': price}
+        pd.DataFrame(raw_data).to_csv("test"+str(i)+".csv")
+
+if False:
+    x = np.arange(90,100,0.01)
+    profit_eval(x)
