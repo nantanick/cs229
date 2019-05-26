@@ -44,8 +44,7 @@ def main():
     label = ['Class']
 
     #Get Data
-    df_train, df_validation, df_test = get_clean_data()
-    Xtrain
+    df_train, df_valid, df_test = get_clean_data()
     Xtrain = df_train[features].values
     Ytrain = df_train[label].values.ravel()
     Xvalid = df_valid[features].values
