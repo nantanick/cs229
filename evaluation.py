@@ -155,6 +155,7 @@ def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,
 
     return value_over_time, cash, units
 
+'''
 #Testing
 price = np.array([100,99,101,102,105,110,115])
 money = 100
@@ -167,3 +168,4 @@ for i in leverage:
                                                         threshold = threshold, leverage = i, short = True)
     raw_data = {'Portfolio Value':value_over_time, 'Cash': cash, 'Units': units, 'Prediction': pred, 'True Price': price}
     pd.DataFrame(raw_data).to_csv("test"+str(i)+".csv")
+'''
