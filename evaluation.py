@@ -99,54 +99,64 @@ def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,
                     units[i] = cash[i]/true_price[i]
                     cash[i] = 0
                     cond = 2
+                    print('Enter Long from none')
                 elif prediction[i] < threshold[0]:
                     units[i] = -cash[i]/true_price[i]
                     cash[i] = cash[i] - units[i]*true_price[i]
                     cond = 3
+                    print('Enter Short from none')
             #Exiting long position
             elif cond == 2 and prediction[i] < threshold[0]:
                 #Exit long
                 cash[i] = cash[i-1] + units[i-1]*true_price[i]
                 units[i] = 0
+                print('Exit long')
                 #Enter Short
                 units[i] = -cash[i]/true_price[i]
                 cash[i] = cash[i] - units[i]*true_price[i]
                 cond = 3
+                print('Enter short from long')
             #Exiting short position
             elif cond == 3 and prediction[i] > threshold[1]:
                 #Exit short
                 cash[i] = cash[i-1] + units[i-1]*true_price[i]
                 units[i] = 0
+                print('Exit Short')
                 #Enter long
-                units[i] = -cash[i]/true_price[i]
+                units[i] = cash[i]/true_price[i]
                 cash[i] = cash[i] - units[i]*true_price[i]
-                cond = 3
+                cond = 2
+                print('Enter long from short')
             #Holding Condition
             else:
                 cash[i] = cash[i-1]
                 units[i] = units[i-1]
+                print('Holding')
         else:
             #Entering position
             if cond == 1 and prediction[i] > threshold[1]:
                 units[i] = cash[i]/true_price[i]
                 cash[i] = 0
                 cond = 2
+                print('Enter')
             #Exiting position
             elif cond == 2 and prediction[i] < threshold[0]:
                 cash[i] = true_price[i]*units[i-1]
                 units[i] = 0
                 cond = 1
+                print('Exit')
             #Holding Condition
             else:
                 cash[i] = cash[i-1]
                 units[i] = units[i-1]
+                print('Holding')
 
     value_over_time = cash + units*true_price - borrow
 
     return value_over_time, cash, units
 
 #Testing
-price = np.array([100,200,400,200,100,200,400])
+price = np.array([100,99,101,102,105,110,115])
 money = 100
 pred = np.array([0.2,0.7,0.5,0.9,0.3,0.1,0.8])
 threshold = np.array([.4,.6])
