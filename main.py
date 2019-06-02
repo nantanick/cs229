@@ -4,7 +4,7 @@ import pandas as pd
 import evaluation as eval
 import os
 import warnings
-from neural import NN_wrapper
+#from neural import NN_wrapper
 from util import get_clean_data
 from LogisticRegression import RegressionModel
 from svm_model import SVMModel
@@ -63,7 +63,6 @@ def main():
     logistic_ridge.train(Xtrain, Ytrain)
     logistic_lasso = RegressionModel(3)
     logistic_lasso.train(Xtrain, Ytrain)
-    print("Finish Logistic")
 
     #Neural Network
     NN = NN_wrapper(Xtrain.shape[1])
