@@ -14,32 +14,19 @@ from sklearn.metrics import classification_report, confusion_matrix, roc_auc_sco
 def main():
     warnings.filterwarnings("ignore", category=FutureWarning)
     features = [
-        'EMA200',
-        'EMA100',
-        'EMA12',
-        'EMA20',
-        'EMA26',
-        'EMA50',
-        'SMA10',
-        'SMA100',
-        'SMA15',
-        'SMA20',
-        'SMA200',
-        'SMA50',
-        'MACD',
-        'Volume',
-        'EMA200Cross',
-        'EMA100Cross',
-        'EMA12Cross',
-        'EMA20Cross',
-        'EMA26Cross',
-        'EMA50Cross',
-        'SMA10Cross',
-        'SMA100Cross',
-        'SMA15Cross',
-        'SMA20Cross',
-        'SMA200Cross',
-        'SMA50Cross'
+        'EMA10','EMA12','EMA20','EMA26','EMA50','EMA100','EMA200',
+        'SMA5','SMA10','SMA15','SMA20','SMA50','SMA100','SMA200',
+        'EMA10Cross','EMA12Cross','EMA20Cross','EMA26Cross','EMA50Cross','EMA100Cross','EMA200Cross',
+        'MACD','Volume','Price',
+        'Up.Down5','Up.Down10','Up.Down15','Up.Down20','Up.Down50','Up.Down100'
+        'SMA5Cross','SMA10Cross','SMA15Cross','SMA20Cross','SMA50Cross','SMA100Cross','SMA200Cross'
+    ]
+    regularized_features = [
+        'SMA5','SMA15','SMA20','SMA200',
+        'EMA10Cross','EMA20Cross','EMA26Cross','EMA50Cross','EMA100Cross','EMA200Cross',
+        'MACD','Volume','Price',
+        'Up.Down10','Up.Down15','Up.Down50','Up.Down100'
+        'SMA5Cross','SMA10Cross','SMA15Cross','SMA20Cross','SMA50Cross','SMA100Cross','SMA200Cross'
     ]
     label = ['Class']
 
