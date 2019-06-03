@@ -52,9 +52,9 @@ def main():
     logistic_lasso.train(Xtrain, Ytrain)
 
     #Neural Network
-    NN = NN_wrapper(Xtrain.shape[1])
-    NN.train(Xtrain,Ytrain)
-    print("Finish Neural Network")
+    # NN = NN_wrapper(Xtrain.shape[1])
+    # NN.train(Xtrain,Ytrain)
+    # print("Finish Neural Network")
 
     #SVM Model
     svm_linear = SVMModel(1)
