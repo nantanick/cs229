@@ -71,6 +71,40 @@ def main():
     svm_sigmoid.train(Xtrain, Ytrain)
     print("Finish SVM Sigmoid")
 
+    #LSTM Model
+
+    look_back = 10
+    def create_dataset(Xtrain, Ytrain, look_back):
+        dataX, dataY = [], []
+        for i in range(len(Xtrain)-look_back-1):
+            a = Xtrain[i:(i+look_back)]
+            dataX.append(a)
+            dataY.append(Ytrain[i + look_back])
+        return np.array(dataX), np.array(dataY)
+
+
+    scale = MinMaxScaler(feature_range=(0, 1))
+    Xtrain = scale.fit_transform(Xtrain)
+    Ytrain = scale.fit_transform(Ytrain.reshape(-1,1))
+    Xtest = scale.fit_transform(Xtest)
+    Ytest = scale.fit_transform(Ytest.reshape(-1,1))
+
+    #Transform dimensions
+    trainX, trainY = create_dataset(Xtrain, Ytrain, look_back)
+    testX, testY = create_dataset(Xtest, Ytest, look_back)
+
+    lstm = LSTMModel()
+    lstm.train(trainX, trainY)
+
+    y_pred = lstm.predict(testX)
+    acc = lstm.evaluate(testX, testY)
+    print("Acuuracy (LSTM)" + str(-acc))
+
+    y_true = Ytest[look_back+1:].ravel()
+    print('AUC Score of', 'LSTM')
+    print(roc_auc_score(np.array(y_true), np.array(y_pred.ravel())))
+
+
     '''
     Prediction
     '''
