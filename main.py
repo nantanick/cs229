@@ -25,7 +25,7 @@ def main():
         'SMA5','SMA15','SMA20','SMA200',
         'EMA10Cross','EMA20Cross','EMA26Cross','EMA50Cross','EMA100Cross','EMA200Cross',
         'MACD','Volume','Price',
-        'Up.Down10','Up.Down15','Up.Down50','Up.Down100'
+        'Up.Down10','Up.Down15','Up.Down50','Up.Down100',
         'SMA5Cross','SMA10Cross','SMA15Cross','SMA20Cross','SMA50Cross','SMA100Cross','SMA200Cross'
     ]
     label = ['Class']
