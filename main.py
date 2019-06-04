@@ -18,14 +18,18 @@ def main():
         'SMA5','SMA10','SMA15','SMA20','SMA50','SMA100','SMA200',
         'EMA10Cross','EMA12Cross','EMA20Cross','EMA26Cross','EMA50Cross','EMA100Cross','EMA200Cross',
         'MACD','Volume','Price',
-        'Up.Down5','Up.Down10','Up.Down15','Up.Down20','Up.Down50','Up.Down100'
+        'Up-Down5','Up-Down10','Up-Down15','Up-Down20','Up-Down50','Up-Down100',
         'SMA5Cross','SMA10Cross','SMA15Cross','SMA20Cross','SMA50Cross','SMA100Cross','SMA200Cross'
     ]
     regularized_features = [
         'SMA5','SMA15','SMA20','SMA200',
         'EMA10Cross','EMA20Cross','EMA26Cross','EMA50Cross','EMA100Cross','EMA200Cross',
         'MACD','Volume','Price',
+<<<<<<< HEAD
         'Up.Down10','Up.Down15','Up.Down50','Up.Down100',
+=======
+        'Up-Down10','Up-Down15','Up-Down50','Up-Down100'
+>>>>>>> a9c925e05b3fa2f67ce93103567916327111e205
         'SMA5Cross','SMA10Cross','SMA15Cross','SMA20Cross','SMA50Cross','SMA100Cross','SMA200Cross'
     ]
     label = ['Class']
@@ -52,9 +56,9 @@ def main():
     logistic_lasso.train(Xtrain, Ytrain)
 
     #Neural Network
-    NN = NN_wrapper(Xtrain.shape[1])
-    NN.train(Xtrain,Ytrain)
-    print("Finish Neural Network")
+    # NN = NN_wrapper(Xtrain.shape[1])
+    # NN.train(Xtrain,Ytrain)
+    # print("Finish Neural Network")
 
     #SVM Model
     svm_linear = SVMModel(1)
@@ -70,6 +74,40 @@ def main():
     print("Finish SVM Rbf")
     svm_sigmoid.train(Xtrain, Ytrain)
     print("Finish SVM Sigmoid")
+
+    #LSTM Model
+
+    look_back = 10
+    def create_dataset(Xtrain, Ytrain, look_back):
+        dataX, dataY = [], []
+        for i in range(len(Xtrain)-look_back-1):
+            a = Xtrain[i:(i+look_back)]
+            dataX.append(a)
+            dataY.append(Ytrain[i + look_back])
+        return np.array(dataX), np.array(dataY)
+
+
+    scale = MinMaxScaler(feature_range=(0, 1))
+    Xtrain = scale.fit_transform(Xtrain)
+    Ytrain = scale.fit_transform(Ytrain.reshape(-1,1))
+    Xtest = scale.fit_transform(Xtest)
+    Ytest = scale.fit_transform(Ytest.reshape(-1,1))
+
+    #Transform dimensions
+    trainX, trainY = create_dataset(Xtrain, Ytrain, look_back)
+    testX, testY = create_dataset(Xtest, Ytest, look_back)
+
+    lstm = LSTMModel()
+    lstm.train(trainX, trainY)
+
+    y_pred = lstm.predict(testX)
+    acc = lstm.evaluate(testX, testY)
+    print("Acuuracy (LSTM)" + str(-acc))
+
+    y_true = Ytest[look_back+1:].ravel()
+    print('AUC Score of', 'LSTM')
+    print(roc_auc_score(np.array(y_true), np.array(y_pred.ravel())))
+
 
     '''
     Prediction
