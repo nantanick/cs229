@@ -6,6 +6,7 @@ import os
 import warnings
 #from neural import NN_wrapper
 from util import get_clean_data
+from LSTM_model import LSTMModel
 from LogisticRegression import RegressionModel
 from svm_model import SVMModel
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
@@ -29,7 +30,7 @@ def main():
         'SMA5Cross','SMA10Cross','SMA15Cross','SMA20Cross','SMA50Cross','SMA100Cross','SMA200Cross'
     ]
     label = ['Class']
-    
+
     #Get Data
     df_train, df_valid, df_test = get_clean_data()
     Xtrain = df_train[features].values
