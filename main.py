@@ -57,19 +57,19 @@ def main():
     # print("Finish Neural Network")
 
     #SVM Model
-    svm_linear = SVMModel(1)
-    svm_poly = SVMModel(2)
-    svm_rbf = SVMModel(3)
-    svm_sigmoid = SVMModel(4)
+    # svm_linear = SVMModel(1)
+    # svm_poly = SVMModel(2)
+    # svm_rbf = SVMModel(3)
+    # svm_sigmoid = SVMModel(4)
 
-    svm_linear.train(Xtrain, Ytrain)
-    print("Finish SVM Linear")
-    svm_poly.train(Xtrain, Ytrain)
-    print("Finish SVM Poly")
-    svm_rbf.train(Xtrain, Ytrain)
-    print("Finish SVM Rbf")
-    svm_sigmoid.train(Xtrain, Ytrain)
-    print("Finish SVM Sigmoid")
+    # svm_linear.train(Xtrain, Ytrain)
+    # print("Finish SVM Linear")
+    # svm_poly.train(Xtrain, Ytrain)
+    # print("Finish SVM Poly")
+    # svm_rbf.train(Xtrain, Ytrain)
+    # print("Finish SVM Rbf")
+    # svm_sigmoid.train(Xtrain, Ytrain)
+    # print("Finish SVM Sigmoid")
 
     #LSTM Model
 
@@ -103,7 +103,6 @@ def main():
     y_true = Ytest[look_back+1:].ravel()
     print('AUC Score of', 'LSTM')
     print(roc_auc_score(np.array(y_true), np.array(y_pred.ravel())))
-
 
     '''
     Prediction
