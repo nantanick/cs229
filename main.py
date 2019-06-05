@@ -97,26 +97,26 @@ def main():
     lstm = LSTMModel()
     lstm.train(trainX, trainY)
 
-    y_pred = lstm.predict(testX)
+    lstm_pred = lstm.predict(testX)
     acc = lstm.evaluate(testX, testY)
     print("Acuuracy (LSTM)" + str(-acc))
 
-    y_true = Ytest[look_back+1:].ravel()
+    lstm_true = Ytest[look_back+1:].ravel()
     print('AUC Score of', 'LSTM')
-    print(roc_auc_score(np.array(y_true), np.array(y_pred.ravel())))
+    print(roc_auc_score(np.array(lstm_true), np.array(lstm_pred.ravel())))
 
     '''
     Prediction
     '''
     all_pred = {}
     all_pred['logistic_pred'] = np.array(logistic.predict(Xvalid)[:,1])
-    all_pred['nn_pred'] = np.array(NN.predict(Xvalid))
+    # all_pred['nn_pred'] = np.array(NN.predict(Xvalid))
     all_pred['logistic_ridge_pred'] = np.array(logistic_ridge.predict(Xvalid))
     all_pred['logistic_lasso_pred'] = np.array(logistic_lasso.predict(Xvalid))
-    all_pred['svm_linear_pred'] = np.array(svm_linear.predict(Xvalid))
-    all_pred['svm_poly_pred'] = np.array(svm_poly.predict(Xvalid))
-    all_pred['svm_rbf_pred'] = np.array(svm_rbf.predict(Xvalid))
-    all_pred['svm_sigmoid_pred'] = np.array(svm_sigmoid.predict(Xvalid))
+    # all_pred['svm_linear_pred'] = np.array(svm_linear.predict(Xvalid))
+    # all_pred['svm_poly_pred'] = np.array(svm_poly.predict(Xvalid))
+    # all_pred['svm_rbf_pred'] = np.array(svm_rbf.predict(Xvalid))
+    # all_pred['svm_sigmoid_pred'] = np.array(svm_sigmoid.predict(Xvalid))
 
     '''
     Evaluations
