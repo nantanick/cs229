@@ -6,7 +6,7 @@ import os
 import warnings
 #from neural import NN_wrapper
 from util import get_clean_data
-from LSTM_model import LSTMModel
+from LSTM_model import RNNModel
 from LogisticRegression import RegressionModel
 from svm_model import SVMModel
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
@@ -96,16 +96,42 @@ def main():
     trainX, trainY = create_dataset(Xtrain, Ytrain, look_back)
     testX, testY = create_dataset(Xtest, Ytest, look_back)
 
-    lstm = LSTMModel()
-    lstm.train(trainX, trainY)
+    model_single_lstm = RNNModel()
+    model_multi_lstm = RNNModel()
+    model_gru = RNNModel()
+    model_single_lstm.train_single_lstm(trainX, trainY)
+    model_multi_lstm.train_multi_lstm(trainX, trainY)
+    model_gru.train_GRU(trainX, trainY)
 
-    lstm_pred = lstm.predict(testX)
-    acc = lstm.evaluate(testX, testY)
-    print("Acuuracy (LSTM)" + str(-acc))
+    single_lstm_pred = model_single_lstm.predict(testX)
+    single_lstm_pred = pd.DataFrame(single_lstm_pred)
+    single_lstm_pred.to_csv('single_lstm_pred.csv')
+    acc = model_single_lstm.evaluate(testX, testY)
+    print("Acuuracy (Multi-layer LSTM)" + str(-acc))
 
-    lstm_true = Ytest[look_back+1:].ravel()
-    print('AUC Score of', 'LSTM')
-    print(roc_auc_score(np.array(lstm_true), np.array(lstm_pred.ravel())))
+    y_true = Ytest[look_back+1:].ravel()
+    print('AUC Score of', 'Multi-layer LSTM')
+    print(roc_auc_score(np.array(y_true), np.array(single_lstm_pred)))
+
+    multi_lstm_pred = model_multi_lstm.predict(testX)
+    multi_lstm_pred = pd.DataFrame(multi_lstm_pred)
+    multi_lstm_pred.to_csv('multi_lstm_pred.csv')
+    acc = model_multi_lstm.evaluate(testX, testY)
+    print("Acuuracy (Single-LSTM)" + str(-acc))
+
+    y_true = Ytest[look_back+1:].ravel()
+    print('AUC Score of', 'Single-LSTM')
+    print(roc_auc_score(np.array(y_true), np.array(multi_lstm_pred)))
+
+    gru_pred = model_gru.predict(testX)
+    gru_pred = pd.DataFrame(gru_pred)
+    gru_pred.to_csv('gru_pred.csv')
+    acc = model_gru.evaluate(testX, testY)
+    print("Acuuracy (GRU)" + str(-acc))
+
+    y_true = Ytest[look_back+1:].ravel()
+    print('AUC Score of', 'GRU')
+    print(roc_auc_score(np.array(y_true), np.array(gru_pred)))
 
     '''
     Prediction
