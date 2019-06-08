@@ -94,41 +94,52 @@ def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,
     '''
     condition 1: all cash
     condition 2: no cash with positive # of shares
-    condition 2: excess cash with negative # of shares
+    condition 3: excess cash with negative # of shares
     '''
     for i in range(n):
         if short:
             #Entering position
             if cond == 1:
                 if prediction[i] > threshold[1]:
-                    units[i] = (1-TRANSACTION_COST)*cash[i]/true_price[i]
-                    cash[i] = 0
-                    cond = 2
+                    if i != 0:
+                        units[i] = (1-transc)*cash[i-1]/true_price[i]
+                        cash[i] = 0
+                        cond = 2
+                    else:
+                        units[i] = (1-transc)*cash[i]/true_price[i]
+                        cash[i] = 0
+                        cond = 2
                     #print('Enter Long from none')
                 elif prediction[i] < threshold[0]:
-                    units[i] = -(1-TRANSACTION_COST)*cash[i]/true_price[i]
+                    units[i] = -(1-transc)*cash[i]/true_price[i]
                     cash[i] = cash[i] - units[i]*true_price[i]
                     cond = 3
                     #print('Enter Short from none')
+                elif i == 0 and prediction[i] > threshold[0] and prediction[i] < threshold[1]:
+                    cond = 1
+                else:
+                    cash[i] = cash[i-1]
+                    units[i] = units[i-1]
+                    cond = 1
             #Exiting long position
             elif cond == 2 and prediction[i] < threshold[0]:
                 #Exit long
-                cash[i] = cash[i-1] + (1-TRANSACTION_COST)*units[i-1]*true_price[i]
+                cash[i] = cash[i-1] + (1-transc)*units[i-1]*true_price[i]
                 units[i] = 0
                 #print('Exit long')
                 #Enter Short
-                units[i] = -(1-TRANSACTION_COST)*cash[i]/true_price[i]
+                units[i] = -(1-transc)*cash[i]/true_price[i]
                 cash[i] = cash[i] - units[i]*true_price[i]
                 cond = 3
                 #print('Enter short from long')
             #Exiting short position
             elif cond == 3 and prediction[i] > threshold[1]:
                 #Exit short
-                cash[i] = cash[i-1] + (1-TRANSACTION_COST)*units[i-1]*true_price[i]
+                cash[i] = cash[i-1] + (1-transc)*units[i-1]*true_price[i]
                 units[i] = 0
                 #print('Exit Short')
                 #Enter long
-                units[i] = (1-TRANSACTION_COST)*cash[i]/true_price[i]
+                units[i] = (1-transc)*cash[i]/true_price[i]
                 cash[i] = 0
                 cond = 2
                 #print('Enter long from short')
@@ -140,13 +151,13 @@ def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,
         else:
             #Entering position
             if cond == 1 and prediction[i] > threshold[1]:
-                units[i] = (1-TRANSACTION_COST)*cash[i]/true_price[i]
+                units[i] = (1-transc)*cash[i]/true_price[i]
                 cash[i] = 0
                 cond = 2
                 #print('Enter')
             #Exiting position
             elif cond == 2 and prediction[i] < threshold[0]:
-                cash[i] = (1-TRANSACTION_COST)*true_price[i]*units[i-1]
+                cash[i] = (1-transc)*true_price[i]*units[i-1]
                 units[i] = 0
                 cond = 1
                 #print('Exit')
@@ -158,8 +169,8 @@ def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,
 
     value_over_time = cash + np.multiply(units,true_price) - borrow
 
-    # raw_data = {'Portfolio Value':value_over_time, 'Cash': cash, 'Units': units}
-    # pd.DataFrame(raw_data).to_csv("debug.csv")
+    raw_data = {'Portfolio Value':value_over_time, 'Cash': cash, 'Units': units}
+    pd.DataFrame(raw_data).to_csv("debug.csv")
 
     return value_over_time
 
