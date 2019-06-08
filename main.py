@@ -6,11 +6,11 @@ import os
 import warnings
 #from neural import NN_wrapper
 from util import get_clean_data
-from LSTM_model import RNNModel
+#from LSTM_model import RNNModel
 from LogisticRegression import RegressionModel
-from svm_model import SVMModel
-from sklearn.preprocessing import LabelEncoder, MinMaxScaler
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, f1_score, accuracy_score
+#from svm_model import SVMModel
+#from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+#from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, f1_score, accuracy_score
 
 def main():
     warnings.filterwarnings("ignore", category=FutureWarning)
@@ -137,35 +137,37 @@ def main():
     Prediction
     '''
     all_pred = {}
-    all_pred['logistic_pred'] = np.array(logistic.predict(Xvalid)[:,1])
+    all_pred['logistic_pred'] = np.array(logistic.predict(Xtest)[:,1])
     # all_pred['nn_pred'] = np.array(NN.predict(Xvalid))
-    all_pred['logistic_ridge_pred'] = np.array(logistic_ridge.predict(Xvalid))
-    all_pred['logistic_lasso_pred'] = np.array(logistic_lasso.predict(Xvalid))
+    all_pred['logistic_ridge_pred'] = np.array(logistic_ridge.predict(Xtest))
+    all_pred['logistic_lasso_pred'] = np.array(logistic_lasso.predict(Xtest))
     # all_pred['svm_linear_pred'] = np.array(svm_linear.predict(Xvalid))
     # all_pred['svm_poly_pred'] = np.array(svm_poly.predict(Xvalid))
     # all_pred['svm_rbf_pred'] = np.array(svm_rbf.predict(Xvalid))
     # all_pred['svm_sigmoid_pred'] = np.array(svm_sigmoid.predict(Xvalid))
 
     '''
-    Evaluations
+    Evaluations: Moved to another file
     '''
-    for key, pred in all_pred.items():
-        print('Accuracy Score of', key)
-        print(eval.accuracy(prediction = pred, true_class = Yvalid))
-        print('F1 Score of', key)
-        print(eval.f1score(prediction = pred, true_class = Yvalid, average='macro'))
-        print('='*50)
+    # for key, pred in all_pred.items():
+    #     print('Accuracy Score of', key)
+    #     print(eval.accuracy(prediction = pred, true_class = Yvalid))
+    #     print('F1 Score of', key)
+    #     print(eval.f1score(prediction = pred, true_class = Yvalid, average='macro'))
+    #     print('='*50)
 
     '''
-    Portfolio Generation
+    Portfolio Generation: Moved to another file
     '''
-    price = df_valid['Price'].values
-    for key, pred in all_pred.items():
-        portfolio = eval.portfolio_generator(principal = 10000.,prediction = pred, true_price = price,threshold = [0.499,0.501] ,leverage = 1 ,short = True)
-        abs_profit, profit, sharpe = eval.profit_eval(portfolio)
-        print('Annual Profit for', key)
-        print(100*profit, '%')
-        print('*'*50)
+    # price = df_valid['Price'].values
+    # for key, pred in all_pred.items():
+    #     portfolio = eval.portfolio_generator(principal = 10000.,prediction = pred, true_price = price,threshold = [0.499,0.501] ,leverage = 1 ,short = True)
+    #     abs_profit, profit, sharpe, profit_per_hr = eval.profit_eval(portfolio)
+    #     print('Annual Profit for', key)
+    #     print(100*profit, '%')
+    #     print('*'*50)
+
+    # pd.DataFrame(all_pred).to_csv("test_pred_logistic.csv")
 
 if __name__ == "__main__":
     main()

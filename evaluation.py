@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn import metrics
 
+TRANSACTION_COST = 0.109 #10.9 bps according to http://www.integrity-research.com/equity-commission-rates-remain-steady/
 def profit_eval(portfolio):
     """
     Output different evaluation metrics from portfolio value over time
@@ -23,7 +24,7 @@ def profit_eval(portfolio):
     sharpe: float
         sharpe ratio - calculated by sqrt[(num_trading_day)*(num_trading_minutes)]*np.mean(minute_return)/volatility
     """
-    num_trading_day = 30.*5/7
+    num_trading_day = 252.
     num_trading_minutes = 390.
     n = len(portfolio)-1
     return_array = np.zeros(n)
@@ -34,8 +35,9 @@ def profit_eval(portfolio):
     power = num_trading_day*num_trading_minutes/len(portfolio)
     profit = (portfolio[len(portfolio)-1]/portfolio[0]) ** (power) - 1
     sharpe = np.sqrt(num_trading_day*num_trading_minutes)*np.mean(return_array)/np.std(return_array)
+    profit_per_hour = (portfolio[n] - portfolio[0])*60/len(portfolio)
 
-    return abs_profit, profit, sharpe
+    return abs_profit, profit, sharpe, profit_per_hour
 
 def accuracy(prediction,true_class):
     pred = np.where(prediction > 0.5, 1, 0)
@@ -100,35 +102,35 @@ def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,
             #Entering position
             if cond == 1:
                 if prediction[i] > threshold[1]:
-                    units[i] = cash[i]/true_price[i]
+                    units[i] = (1-TRANSACTION_COST)*cash[i]/true_price[i]
                     cash[i] = 0
                     cond = 2
                     #print('Enter Long from none')
                 elif prediction[i] < threshold[0]:
-                    units[i] = -cash[i]/true_price[i]
+                    units[i] = -(1-TRANSACTION_COST)*cash[i]/true_price[i]
                     cash[i] = cash[i] - units[i]*true_price[i]
                     cond = 3
                     #print('Enter Short from none')
             #Exiting long position
             elif cond == 2 and prediction[i] < threshold[0]:
                 #Exit long
-                cash[i] = cash[i-1] + units[i-1]*true_price[i]
+                cash[i] = cash[i-1] + (1-TRANSACTION_COST)*units[i-1]*true_price[i]
                 units[i] = 0
                 #print('Exit long')
                 #Enter Short
-                units[i] = -cash[i]/true_price[i]
+                units[i] = -(1-TRANSACTION_COST)*cash[i]/true_price[i]
                 cash[i] = cash[i] - units[i]*true_price[i]
                 cond = 3
                 #print('Enter short from long')
             #Exiting short position
             elif cond == 3 and prediction[i] > threshold[1]:
                 #Exit short
-                cash[i] = cash[i-1] + units[i-1]*true_price[i]
+                cash[i] = cash[i-1] + (1-TRANSACTION_COST)*units[i-1]*true_price[i]
                 units[i] = 0
                 #print('Exit Short')
                 #Enter long
-                units[i] = cash[i]/true_price[i]
-                cash[i] = cash[i] - units[i]*true_price[i]
+                units[i] = (1-TRANSACTION_COST)*cash[i]/true_price[i]
+                cash[i] = 0
                 cond = 2
                 #print('Enter long from short')
             #Holding Condition
@@ -139,13 +141,13 @@ def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,
         else:
             #Entering position
             if cond == 1 and prediction[i] > threshold[1]:
-                units[i] = cash[i]/true_price[i]
+                units[i] = (1-TRANSACTION_COST)*cash[i]/true_price[i]
                 cash[i] = 0
                 cond = 2
                 #print('Enter')
             #Exiting position
             elif cond == 2 and prediction[i] < threshold[0]:
-                cash[i] = true_price[i]*units[i-1]
+                cash[i] = (1-TRANSACTION_COST)*true_price[i]*units[i-1]
                 units[i] = 0
                 cond = 1
                 #print('Exit')
@@ -157,8 +159,8 @@ def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,
 
     value_over_time = cash + np.multiply(units,true_price) - borrow
 
-    raw_data = {'Portfolio Value':value_over_time, 'Cash': cash, 'Units': units}
-    pd.DataFrame(raw_data).to_csv("debug.csv")
+    # raw_data = {'Portfolio Value':value_over_time, 'Cash': cash, 'Units': units}
+    # pd.DataFrame(raw_data).to_csv("debug.csv")
 
     return value_over_time
 
