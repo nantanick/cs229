@@ -36,14 +36,14 @@ Portfolio Generation
 '''
 result = dict()
 for key, pred in prediction_dict.items():
-    portfolio = eval.portfolio_generator(principal = 1000.,prediction = pred, true_price = price,threshold = [0.45,0.55] ,leverage = 1 ,short = True, transc = 0.0015)
+    portfolio = eval.portfolio_generator(principal = 1000.,prediction = pred, true_price = price,threshold = [0.45,0.55] ,leverage = 1 ,short = True, transc = 0.)
     abs_profit, profit, sharpe, profit_per_hr = eval.profit_eval(portfolio)
     result[str(key)] = portfolio
     print(portfolio)
     print(key + 'AUC Score', roc_auc_score(TRUE_CLASS, pred))
     print(key +'Profit/hr', profit_per_hr)
     #print(key +'sharpe', sharpe)
-    print(key +'annaul profit', profit)
+    print(key +'annaul profit', profit*100, '%')
     print(key + "Accuaracy", eval.accuracy(prediction = pred,true_class = TRUE_CLASS))
     #print(key + "F1Score" , eval.f1score(prediction = pred,true_class = TRUE_CLASS, average='macro'))
     print('*'*50)
