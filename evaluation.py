@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 from sklearn import metrics
 
-TRANSACTION_COST = 0.109 #10.9 bps according to http://www.integrity-research.com/equity-commission-rates-remain-steady/
 def profit_eval(portfolio):
     """
     Output different evaluation metrics from portfolio value over time
@@ -49,7 +48,7 @@ def f1score(prediction,true_class, average='micro'):
     score = metrics.f1_score(pred, true_class, average = average)
     return score
 
-def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,short = True):
+def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,short = True, transc = 0.109):
 
     """
     Generate portfolio value over time from prediction
