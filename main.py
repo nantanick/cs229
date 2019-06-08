@@ -6,11 +6,11 @@ import os
 import warnings
 #from neural import NN_wrapper
 from util import get_clean_data
-#from LSTM_model import RNNModel
+from LSTM_model import RNNModel
 from LogisticRegression import RegressionModel
 #from svm_model import SVMModel
-#from sklearn.preprocessing import LabelEncoder, MinMaxScaler
-#from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, f1_score, accuracy_score
+from sklearn.preprocessing import LabelEncoder, MinMaxScaler
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score, f1_score, accuracy_score
 
 def main():
     warnings.filterwarnings("ignore", category=FutureWarning)
