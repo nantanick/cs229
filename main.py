@@ -96,34 +96,41 @@ def main():
     trainX, trainY = create_dataset(Xtrain, Ytrain, look_back)
     testX, testY = create_dataset(Xtest, Ytest, look_back)
 
+
+    print('Ytest', Ytest.shape)
+    print('testY', testY.shape)
+
     model_single_lstm = RNNModel()
     model_multi_lstm = RNNModel()
     model_gru = RNNModel()
-    model_single_lstm.train_single_lstm(trainX, trainY)
-    model_multi_lstm.train_multi_lstm(trainX, trainY)
+    # model_single_lstm.train_single_lstm(trainX, trainY)
+    # model_multi_lstm.train_multi_lstm(trainX, trainY)
     model_gru.train_GRU(trainX, trainY)
 
-    single_lstm_pred = model_single_lstm.predict(testX)
-    single_lstm_pred = pd.DataFrame(single_lstm_pred)
-    single_lstm_pred.to_csv('single_lstm_pred.csv')
-    acc = model_single_lstm.evaluate(testX, testY)
-    print("Acuuracy (Multi-layer LSTM)" + str(-acc))
-
-    y_true = Ytest[look_back+1:].ravel()
-    print('AUC Score of', 'Multi-layer LSTM')
-    print(roc_auc_score(np.array(y_true), np.array(single_lstm_pred)))
-
-    multi_lstm_pred = model_multi_lstm.predict(testX)
-    multi_lstm_pred = pd.DataFrame(multi_lstm_pred)
-    multi_lstm_pred.to_csv('multi_lstm_pred.csv')
-    acc = model_multi_lstm.evaluate(testX, testY)
-    print("Acuuracy (Single-LSTM)" + str(-acc))
-
-    y_true = Ytest[look_back+1:].ravel()
-    print('AUC Score of', 'Single-LSTM')
-    print(roc_auc_score(np.array(y_true), np.array(multi_lstm_pred)))
+    # single_lstm_pred = model_single_lstm.predict(testX)
+    # print('single_lstm_pred', single_lstm_pred.shape)
+    # single_lstm_pred = pd.DataFrame(single_lstm_pred)
+    # single_lstm_pred.to_csv('single_lstm_pred.csv')
+    # acc = model_single_lstm.evaluate(testX, testY)
+    # print("Acuuracy (Multi-layer LSTM)" + str(-acc))
+    #
+    # y_true = Ytest[look_back+1:].ravel()
+    # print('AUC Score of', 'Multi-layer LSTM')
+    # print(roc_auc_score(np.array(y_true), np.array(single_lstm_pred)))
+    #
+    # multi_lstm_pred = model_multi_lstm.predict(testX)
+    # print('multi_lstm_pred', multi_lstm_pred.shape)
+    # multi_lstm_pred = pd.DataFrame(multi_lstm_pred)
+    # multi_lstm_pred.to_csv('multi_lstm_pred.csv')
+    # acc = model_multi_lstm.evaluate(testX, testY)
+    # print("Acuuracy (Single-LSTM)" + str(-acc))
+    #
+    # y_true = Ytest[look_back+1:].ravel()
+    # print('AUC Score of', 'Single-LSTM')
+    # print(roc_auc_score(np.array(y_true), np.array(multi_lstm_pred)))
 
     gru_pred = model_gru.predict(testX)
+    print('gru_pred', gru_pred.shape)
     gru_pred = pd.DataFrame(gru_pred)
     gru_pred.to_csv('gru_pred.csv')
     acc = model_gru.evaluate(testX, testY)
