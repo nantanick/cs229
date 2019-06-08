@@ -111,9 +111,14 @@ def portfolio_generator(principal,prediction,true_price,threshold, leverage = 1,
                         cond = 2
                     #print('Enter Long from none')
                 elif prediction[i] < threshold[0]:
-                    units[i] = -(1-transc)*cash[i]/true_price[i]
-                    cash[i] = cash[i] - units[i]*true_price[i]
-                    cond = 3
+                    if i != 0:
+                        units[i] = -(1-transc)*cash[i-1]/true_price[i]
+                        cash[i] = cash[i-1] - units[i]*true_price[i]
+                        cond = 3
+                    else:
+                        units[i] = -(1-transc)*cash[i]/true_price[i]
+                        cash[i] = cash[i] - units[i]*true_price[i]
+                        cond = 3
                     #print('Enter Short from none')
                 elif i == 0 and prediction[i] > threshold[0] and prediction[i] < threshold[1]:
                     cond = 1
