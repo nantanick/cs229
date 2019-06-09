@@ -46,7 +46,7 @@ class CNN_wrapper():
 		y_hat = []
 		for x in x_test:
 			y_hat.append(self.model.forward(x.unsqueeze(0)).data.numpy())
-		return np.array(y_hat)
+		return y_hat
 
 	def get_series(self, X, Y):
 		new_X = []
@@ -100,5 +100,8 @@ if __name__ == '__main__':
 	CNN.train(X,Y)
 
 	X = validation.drop(['Date','Class','Minute'], axis=1).values
-	np.savetxt('cnn.txt', CNN.predict(X))
+	train_out = pd.DataFrame(CNN.predict(X))
+	train_out.to_csv('cnn_train.csv')
+	test_out = pd.DataFrame(CNN.predict(X))
+	test_out.to_csv('cnn_test.csv')
 
