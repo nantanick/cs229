@@ -24,7 +24,7 @@ prediction_dict['SVM_Sigmoid'] = prediction['SVMSigmoid'].values
 prediction_dict['GRU'] = prediction['GRU'].values
 prediction_dict['Single_LSTM'] = prediction['SingleLSTM'].values
 prediction_dict['Multi_LSTM'] = prediction['MultiLSTM'].values
-#prediction_dict['CNN'] = prediction['CNN'].values
+prediction_dict['CNN'] = prediction['CNN'].values
 prediction_dict['logistic_lasso'] = prediction['logistic_lasso_pred'].values
 prediction_dict['logistic_ridge'] = prediction['logistic_ridge_pred'].values
 prediction_dict['logistic'] = prediction['logistic_pred'].values
@@ -36,17 +36,18 @@ Portfolio Generation
 '''
 result = dict()
 for key, pred in prediction_dict.items():
-    portfolio = eval.portfolio_generator(principal = 1000.,prediction = pred, true_price = price,threshold = [0.45,0.55] ,leverage = 1 ,short = True, transc = 0.)
-    abs_profit, profit, sharpe, profit_per_hr = eval.profit_eval(portfolio)
-    result[str(key)] = portfolio
-    print(portfolio)
-    print(key + 'AUC Score', roc_auc_score(TRUE_CLASS, pred))
-    print(key +'Profit/hr', profit_per_hr)
-    #print(key +'sharpe', sharpe)
-    print(key +'annaul profit', profit*100, '%')
-    print(key + "Accuaracy", eval.accuracy(prediction = pred,true_class = TRUE_CLASS))
-    #print(key + "F1Score" , eval.f1score(prediction = pred,true_class = TRUE_CLASS, average='macro'))
-    print('*'*50)
+    if key == "CNN":
+        portfolio = eval.portfolio_generator(principal = 1000.,prediction = pred, true_price = price,threshold = [0.499999,0.500001] ,leverage = 1 ,short = True, transc = 0.)
+        abs_profit, profit, sharpe, profit_per_hr = eval.profit_eval(portfolio)
+        result[str(key)] = portfolio
+        print(portfolio)
+        print(key + 'AUC Score', roc_auc_score(TRUE_CLASS, pred))
+        print(key +'Profit/hr', profit_per_hr)
+        #print(key +'sharpe', sharpe)
+        print(key +'annaul profit', profit*100, '%')
+        print(key + "Accuaracy", eval.accuracy(prediction = pred,true_class = TRUE_CLASS))
+        #print(key + "F1Score" , eval.f1score(prediction = pred,true_class = TRUE_CLASS, average='macro'))
+        print('*'*50)
 
 #Plot
 # plt.plot(result['Baseline'], label = "Baseline Strategy")
