@@ -7,6 +7,7 @@ from util import get_clean_data
 import math
 import numpy as np
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
 
 class CNN_wrapper():
 	def __init__(self, input_dim, lr = 1e-4, look_back = 5):
@@ -49,6 +50,8 @@ class CNN_wrapper():
 		return y_hat
 
 	def get_series(self, X, Y):
+		scale = MinMaxScaler(feature_range=(0, 1))
+		X = scale.fit_transform(X)
 		new_X = []
 		new_Y = []
 		for i in range(len(X)-self.look_back):
@@ -76,16 +79,14 @@ class CNN_wrapper():
 class CNN(nn.Module):
 	def __init__(self, embed_size, filters, input_size, kernel_size=5):
 		super(CNN, self).__init__()
-		self.conv1 = nn.Conv1d(embed_size, 5, kernel_size)
-		self.max_pool = nn.MaxPool1d(21-kernel_size+1)
+		self.conv1 = nn.Conv1d(embed_size, 20, kernel_size)
 		self.dropout = nn.Dropout(0.3)
-		self.lin = nn.Linear(5,1)
+		self.lin = nn.Linear(20,1)
 
 
 	def forward(self, x):
 		x_reshaped = x.permute(0,2,1)
-		x_conv1 = F.relu(self.conv1(x_reshaped))
-		self.dropout(x_conv1)	
+		x_conv1 = torch.sigmoid(self.conv1(x_reshaped))
 		x_conv1_reshape =  x_conv1.squeeze(dim=0).squeeze(dim=1)
 		x_lin = self.lin(x_conv1_reshape)
 		out = torch.sigmoid(x_lin)
